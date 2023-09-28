@@ -24,7 +24,7 @@ function GradeAssignment ( ) {
   const fetchGrades = ( ) => {
       setMessage('');
       console.log("fetchGrades "+assignmentId);
-      fetch(`${SERVER_URL}/gradebook/${assignmentId}`)
+      fetch(`${SERVER_URL}/assignment/${assignmentId}`)
       .then((response) => response.json()) 
       .then((data) => { setGrades(data) })        
       .catch(err => { 
