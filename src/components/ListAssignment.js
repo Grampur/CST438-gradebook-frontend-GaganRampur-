@@ -16,20 +16,74 @@ function ListAssignment(props) {
   const fetchAssignments = () => {
     console.log("fetchAssignments");
     fetch(`${SERVER_URL}/assignment`)
-    .then((response) => response.json() ) 
-    .then((data) => { 
-      console.log("assignment length "+data.length);
-      setAssignments(data);
-     }) 
-    .catch(err => console.error(err)); 
-  }
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("assignment length " + data.length);
+        if (Array.isArray(data)) {
+          setAssignments(data);
+        } else {
+          console.error("Data is not an array:", data);
+          setMessage("Error: Data is not in the expected format.");
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        setMessage("Error: Failed to fetch assignments.");
+      });
+  };
   
   
-    const headers = ['Assignment Name', 'Course Title', 'Due Date', ' ', ' ', ' '];
+  const deleteAssignment = (id) => {
+    
+
+    console.log();
+    console.log("console",id);
+
+    let forceString = '';
+    if(document.getElementById('force').checked){
+      forceString = "?force=true";
+    }
+    
+    fetch(`${SERVER_URL}/assignmentDelete/${id}` + forceString, {
+      method: 'DELETE',
+
+    })
+      // // .then((response) => response.json())
+      // .then((data) => {
+      //   console.log(data.message); 
+      // })
+      .catch((err) => {
+        console.error(err);
+        setMessage('Error: Failed to delete assignment.');
+      });
+
+
+      window.location.reload();
+  };
+  
+    const headers = ['Assignment Name', 'Course Title', 'Due Date', ' ', ' ', ''];
+    for(let i = 0; i < assignments.length; i++){
+      console.log(assignments[i].id, " ");
+    }
+    
     
     return (
       <div>
         <h3>Assignments</h3>
+
+
+        <Link to="/addAssignment">
+          <button variant="outlined" color="secondary" style={{ margin: 10 }}>
+            Add Assignment
+          </button>
+          
+        </Link>
+        
+        <br/>
+        Force delete?
+        <br/>
+        <input type="checkbox" id="force" name="force" value="true"/>
+
         <div margin="auto" >
           <h4>{message}&nbsp;</h4>
               <table className="Center"> 
@@ -39,6 +93,7 @@ function ListAssignment(props) {
                   </tr>
                 </thead>
                 <tbody>
+                
                   {assignments.map((row, idx) => (
                     <tr key={idx}>
                       <td>{row.assignmentName}</td>
@@ -47,8 +102,9 @@ function ListAssignment(props) {
                       <td>
                         <Link to={`/gradeAssignment/${assignments[idx].id}`} >Grade</Link>
                       </td>
-                      <td>Edit</td>
-                      <td>Delete</td>
+                      <td> <Link to= {`/editAssignment/${assignments[idx].id}`}>Edit </Link></td>
+
+                      <td><a href="#" onClick={() => deleteAssignment(assignments[idx].id)}>Delete</a></td>
                     </tr>
                   ))}
                 </tbody>
